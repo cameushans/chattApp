@@ -38,22 +38,17 @@ app.post("/sign-in",async (req,res,next)=>{
     req.body.email;
     req.body.password;
     const {authorization} = req.headers;
-    const existingUser = await user.find();
-    const currentUser =  await existingUser.filter((element,index)=>{
-      return  req.body.email === element.email;
-    });
+    const currentUser = await user.findOne({email:req.body.email});
 
-    await currentUser.map((element,index)=>{
-        bcrypt.compare(req.body.password,element.password,(error,result)=>{
+       await  bcrypt.compare(req.body.password,currentUser.password,(error,result)=>{
              //return a boolean , if true the user is authenticate an can access what you allow him to access
              if(result){
-             const token = jwt.sign(element.email,"secret")//generate a token when the user is authenticate 
-             redisCl.set(token,element.id,(err,res)=>console.log(res))//store the token in the redis cache db
-             redisCl.get(token,(err,token)=>res.send({token:token}))//request the token 
+             const token = jwt.sign(currentUser.email,"secret")//generate a token when the user is authenticate 
+             redisCl.set(token,currentUser.id,(err,res)=>console.log(res))//store the token in the redis cache db
+             redisCl.get(token,(err,token)=>res.send({token:token,data:"login with successs"}))//request the token 
              }
 
         })
-    })
  });
 
    
@@ -63,10 +58,10 @@ app.post("/sign-up",async (req,res,next)=>{
     req.session.username = req.body.username;
     req.session.password = req.body.password;
 
-      await  user.findOne({email:req.session.email}).then((result)=>{
+     await  user.findOne({email:req.session.email}).then((result)=>{
              if(result){
-                 res.send("email already exist choose an other email"
-                 )
+                 console.log(result.email)
+                 res.send("email already exist choose an other email ")
              } else {
                  bcrypt.hash(req.session.password,10,(err,data)=>{
 
@@ -81,7 +76,8 @@ app.post("/sign-up",async (req,res,next)=>{
             })
 });
 
-app.get("/myAccount",(req,res,next)=>{
+app.get("/chat",(req,res,next)=>{
+  console.log(req.session.email)
  
 })
   
