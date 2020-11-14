@@ -46,31 +46,39 @@ app.post("/sign-in",async (req,res,next)=>{
     await currentUser.map((element,index)=>{
         bcrypt.compare(req.body.password,element.password,(error,result)=>{
              //return a boolean , if true the user is authenticate an can access what you allow him to access
+             if(result){
              const token = jwt.sign(element.email,"secret")//generate a token when the user is authenticate 
              redisCl.set(token,element.id,(err,res)=>console.log(res))//store the token in the redis cache db
-             redisCl.get(token,(err,rest)=>res.send({token:rest}))//request the token 
+             redisCl.get(token,(err,token)=>res.send({token:token}))//request the token 
+             }
 
-                
         })
     })
  });
+
    
  ////This route handle sign up and encrypt password 
 app.post("/sign-up",async (req,res,next)=>{
     req.session.email = req.body.email;
     req.session.username = req.body.username;
     req.session.password = req.body.password;
-    
-    await bcrypt.hash(req.session.password,10,(err,data)=>{
 
-        var newUser = new user({
-            username:req.session.username,
-            password:data,
-            email:req.session.email
-        })
+      await  user.findOne({email:req.session.email}).then((result)=>{
+             if(result){
+                 res.send("email already exist choose an other email"
+                 )
+             } else {
+                 bcrypt.hash(req.session.password,10,(err,data)=>{
 
-        newUser.save();
-    });
+                    var newUser = new user({
+                        username:req.session.username,
+                        password:data,
+                        email:req.session.email
+                    })
+                    newUser.save();
+                })
+             }
+            })
 });
 
 app.get("/myAccount",(req,res,next)=>{
