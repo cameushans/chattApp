@@ -5,41 +5,39 @@ const user = require("../model/mongooseSchema");
 
 
 
-
-
 Router.post("/",  (req,res,next) => {
-    
-    const newUser =  {
+
+   const newUser =  {
         email: req.session.email = req.body.email,
         username: req.session.username = req.body.username,
         password: req.session.password = req.body.password
-     }
+     };
 
-     function saveUser(emailUser,instructions)  {
-               user.findOne({email:emailUser})
+   function signUp(emailNewUser,funcToHash)  {
+               user.findOne({email:emailNewUser})
                      .then(result => {
                            result  ?
                            res.send("email allready exists") :
-                           instructions(newUser)
+                           funcToHash(newUser);
                         })
-         }
+                      .catch(err => console.log(error));  
+         };
 
+    function hashPassword (newUser)  {
+        bcrypt.hash(newUser.password,10,(err,hashedPassword) =>  saveUserInDb(newUser,hashedPasswor))
+      };
 
-    function signUser (userInput)  {
-        bcrypt.hash(userInput.password,10,(err,data)=>{
-            var newUser = new user({
-                username:userInput.username,
-                password:data,
-                email:userInput.email,
-                date:Date.now()
-            })
-            newUser.save();
-        
-    })}
+    function saveUserInDb(newUser,hashedPassword){
+         var newUser = new user({
+            username:newUser.username,
+            password:hashedPassword,
+            email:newUser.email,
+            date:Date.now()
+      });
+          newUser.save();
+    };
 
-   SaveUser(newUser.email,signUser)
-
-})
-
+    signUp(newUser.email,hashPassword);
+});
 
 module.exports = Router;
