@@ -1,11 +1,11 @@
 const express = require('express');
-const Router = express.Router();
+const router = express.Router();
 const bcrypt =  require('bcrypt');
 const user = require("../model/mongooseSchema");
 
 
 
-Router.post("/",  (req,res,next) => {
+router.post("/",  (req,res,next) => {
 
    const newUser =  {
         email: req.session.email = req.body.email,
@@ -24,7 +24,7 @@ Router.post("/",  (req,res,next) => {
          };
 
     function hashPassword (newUser)  {
-        bcrypt.hash(newUser.password,10,(err,hashedPassword) =>  saveUserInDb(newUser,hashedPasswor))
+        bcrypt.hash(newUser.password,10,(err,hashedPassword) =>  saveUserInDb(newUser,hashedPassword))
       };
 
     function saveUserInDb(newUser,hashedPassword){
@@ -33,11 +33,13 @@ Router.post("/",  (req,res,next) => {
             password:hashedPassword,
             email:newUser.email,
             date:Date.now()
-      });
+          });
           newUser.save();
-    };
+     };
 
     signUp(newUser.email,hashPassword);
 });
 
-module.exports = Router;
+
+
+module.exports = router;

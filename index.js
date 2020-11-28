@@ -36,10 +36,6 @@ app.use(bodyParser.urlencoded({
  app.use("/chat",chat);       
  app.use("/sign-in",signIn);
  app.use("/sign-up",signUp);
-/* function verifySession (coucou) {
-    console.log(coucou)
-}
-verifySession("hi")
- */
+ 
+
 app.listen(3000,(err,res) => console.log("Nokia connecting people"));
-/* module.exports = verifySession; */

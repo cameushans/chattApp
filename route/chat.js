@@ -3,9 +3,8 @@ const Router = express.Router();
 
 
 
-Router.get("/",(req,res,next) => {
-console.log("coucou i am in chat")
+Router.get("/",(req,res,next) => {  console.log("coucou i am in chat");
 })
-
+  
 
 module.exports = Router;
